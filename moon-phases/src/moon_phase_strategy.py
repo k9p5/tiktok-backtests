@@ -1,15 +1,18 @@
 import backtrader as bt
 from datetime import datetime
 from typing import Callable
-from .utils import delta, phase
+from .utils import delta
+from .moon_phases import MoonPhases, get_moon_phase
 
 
 class MoonPhaseStrategy(bt.Strategy):
 
-    def __init__(self, result_callback: Callable[[float], None]):
+    def __init__(self, result_callback: Callable):
+        self.result_callback = result_callback
         self.roi = 0
         self.order_price = 0
-        self.result_callback = result_callback
+        self.win= 0
+        self.loose= 0
 
     def next(self):
         _date = self.datas[0].datetime
@@ -25,11 +28,13 @@ class MoonPhaseStrategy(bt.Strategy):
         )
         try:
             assert today > yesterday # not the case at index 0
-            p1 = phase(today)
-            p2 = phase(yesterday)
-            if p1 == 'Full Moon' and p2 != 'Full Moon':
+            p1 = get_moon_phase(today)
+            p2 = get_moon_phase(yesterday)
+            if (p1 == MoonPhases.FULL_MOON
+                and p2 != MoonPhases.FULL_MOON):
                 self.buy() # enter long
-            if p1 == 'New Moon' and p2 != 'New Moon':
+            if (p1 == MoonPhases.NEW_MOON
+                and p2 != MoonPhases.NEW_MOON):
                 self.close() # close long position
         except:
             pass
@@ -48,9 +53,15 @@ class MoonPhaseStrategy(bt.Strategy):
                 self.order_price = order.executed.price
             elif order.issell():
                 self.roi += delta(self.order_price, order.executed.price)
-
+                if self.order_price <= order.executed.price:
+                    self.win += 1
+                else:
+                    self.loose += 1
         # Reset orders
         self.order = None
 
     def stop(self):
-        self.result_callback(self.roi)
+        self.result_callback({
+            'roi': self.roi,
+            'win_rate': self.win / (self.win + self.loose)
+        })

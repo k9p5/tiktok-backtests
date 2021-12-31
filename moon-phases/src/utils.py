@@ -1,31 +1,8 @@
 import os
-import math, decimal
 from typing import Union, Tuple
 from datetime import datetime
 from twelvedata import TDClient
 
-dec = decimal.Decimal
-
-def phase(date: datetime):
-    """
-    moonphase.py - Calculate Lunar Phase
-    Author: Sean B. Palmer, inamidst.com
-    Cf. http://en.wikipedia.org/wiki/Lunar_phase#Lunar_phase_calculation
-    """
-    diff = date - datetime(2001, 1, 1)
-    days = dec(diff.days) + (dec(diff.seconds) / dec(86400))
-    lunations = dec("0.20439731") + (days * dec("0.03386319269"))
-    index = math.floor((lunations % dec(1) * dec(8)) + dec("0.5"))
-    return [
-        "New Moon", 
-        "Waxing Crescent", 
-        "First Quarter", 
-        "Waxing Gibbous", 
-        "Full Moon", 
-        "Waning Gibbous", 
-        "Last Quarter", 
-        "Waning Crescent"
-    ][int(index) & 7]
 
 def delta(old_value: float, new_value: float) -> float:
     """Get the price change: ouput range = [0, 1]
