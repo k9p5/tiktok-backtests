@@ -5,20 +5,21 @@ from .utils import (
     max_delta,
     crossed
 )
+from .config import Config
 
 
 class GoldenCrossStrategy(bt.Strategy):
     # list of parameters which are configurable for the strategy
     params = dict(
-        pfast=21,  # period for the fast moving average
-        pslow=50,  # period for the slow moving average
-        ptrend=200   # trend moving average
+        pfast=Config.sma_fast,      # period for the fast moving average
+        pslow=Config.sma_slow,      # period for the slow moving average
+        ptrend=Config.sma_trend     # trend moving average
     )
 
     def __init__(self, result_callback: Callable[[float], None]):
-        self.sma1 = bt.ind.SMA(period=self.p.pfast)  # fast moving average
-        self.sma2 = bt.ind.SMA(period=self.p.pslow)  # slow moving average
-        self.sma3 = bt.ind.SMA(period=self.p.ptrend)  # slow moving average
+        self.sma1 = bt.ind.SMA(period=self.p.pfast)     # fast moving average
+        self.sma2 = bt.ind.SMA(period=self.p.pslow)     # slow moving average
+        self.sma3 = bt.ind.SMA(period=self.p.ptrend)    # slow moving average
         self.roi = 0
         self.order_price = 0
         self.result_callback = result_callback

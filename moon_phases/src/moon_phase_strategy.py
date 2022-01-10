@@ -39,8 +39,6 @@ class MoonPhaseStrategy(bt.Strategy):
         except:
             pass
 
-            
-
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
             # An active Buy/Sell order has been submitted/accepted - Nothing to do
@@ -61,6 +59,10 @@ class MoonPhaseStrategy(bt.Strategy):
         self.order = None
 
     def stop(self):
+        """
+        Called when all items of the
+        timeseries have been processed
+        """
         self.result_callback({
             'roi': self.roi,
             'win_rate': self.win / (self.win + self.loose)

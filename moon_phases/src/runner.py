@@ -1,14 +1,9 @@
 import os
 import backtrader as bt
-from datetime import datetime
 from .csv_data_feed import CSVDataFeed
 from .moon_phase_strategy import MoonPhaseStrategy
 from .utils import get_data_path
-
-
-end_date = datetime.now()
-start_date = datetime(2019,1,1)
-symbols = ["BTC/USD"]
+from .config import Config
 
 def test_symbol(symbol: str) -> None:
 
@@ -18,8 +13,8 @@ def test_symbol(symbol: str) -> None:
     try:
         data_path = get_data_path(
             symbol,
-            start_date,
-            end_date,
+            Config.start_date,
+            Config.end_date,
             interval="1day"
         )
     except:
@@ -44,13 +39,12 @@ def test_symbol(symbol: str) -> None:
     # Run over everything
     cerebro.run()
 
-    if len(symbols) == 1:
+    if len(Config.symbols) == 1:
         cerebro.plot()
 
     os.remove(data_path)
 
 
 def run_tests():
-    """Test one or more symbols
-    """
-    list(map(test_symbol, symbols))
+    """Test one or more symbols"""
+    list(map(test_symbol, Config.symbols))
